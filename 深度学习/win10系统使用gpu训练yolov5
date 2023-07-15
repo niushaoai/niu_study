@@ -1,25 +1,32 @@
-cuda+cudnn并安装：
+1、cuda+cudnn并安装：
 
 命令窗口nvidia-smi查看 CUDA Version: 是自己电脑能够兼容的cuda最新版本
 通过网站https://developer.nvidia.cn/cuda-toolkit-archive（不需要开科技）进行cuda下载
-cudnn官网下载 需要英伟达账号
------------
-Anaconda 安装虚拟环境
 
-pytorch环境配置：
+2、cudnn官网下载 需要英伟达账号
+也可以通过百度网盘下载：
+Cudnn(CUDA11.x):
+	链接：https://pan.baidu.com/s/1P4m66L8M-pVEkdkM_4jfiQ 提取码：1314
+Cudnn(CUDA12.x):
+	链接：https://pan.baidu.com/s/1bwXOPNOouxJpMnK3QsVd-w 提取码：1314
+
+3、Anaconda 安装虚拟环境
+官网下载：https://www.anaconda.com/
+
+4、pytorch环境配置：
 
 https://download.pytorch.org/whl/torch_stable.html中下载和https://pytorch.org/get-started/previous-versions/
 里面的对应的CUDA+pytorch+python
 CUDA+torchvision+python版本两个whl文件
 然后在环境（虚拟环境或者本地环境）中进入存放两个whl文件的文件夹使用命令 “pip install 文件名.whl”进行pytorch下载
 
-下载pycharm专业版：
+5、下载pycharm专业版：
 通过微信公众号"软件管家"下载并安装
 
-训练自己的yolov5目标检测：
+6、训练自己的yolov5目标检测：
 博客：https://blog.csdn.net/didiaopao/article/details/119954291?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168940569816800188569587%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=168940569816800188569587&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-2-119954291-null-null.142^v88^koosearch_v1,239^v2^insert_chatgpt&utm_term=yolov5&spm=1018.2226.3001.4187
 b站：https://www.bilibili.com/video/BV1f44y187Xg/?spm_id_from=333.337.search-card.all.click&vd_source=221d2a1196954cb4bf925ebabcfa146e
 可以在命令窗口输入nvidia-smi查看GPU使用的真实状况
 
-在训练出pt文件以后通过以下博客文章将pt文件转换为onnx文件（建议yolov5.60版本）
+7、在训练出pt文件以后通过以下博客文章将pt文件转换为onnx文件（建议yolov5.60版本）
 https://blog.csdn.net/unihai/article/details/128546086?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_utm_term~default-9-128546086-blog-124372225.235^v38^pc_relevant_sort_base2&spm=1001.2101.3001.4242.6&utm_relevant_index=12
