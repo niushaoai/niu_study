@@ -1,0 +1,94 @@
+使用树莓派搭建NAS服务器
+•  第一步：安装树莓派操作系统。
+您可以从树莓派官网https://zhuanlan.zhihu.com/p/393662555下载 bullseye 版本的 Raspberry Pi OS Lite 镜像文件，然后使用 Raspberry Pi Imager、Win32DiskImager 或 balenaEtcher 等工具将其烧录到一张至少 8 GB 的 SD 卡上。您可以参考这篇文章https://zhuanlan.zhihu.com/p/435706317或这篇文章https://blog.csdn.net/qq_41676577/article/details/128063914来了解如何烧录系统。
+
+•  第二步：配置树莓派网络和 SSH 服务。
+您可以在烧录系统之前，在 SD 卡的 boot 分区中创建一个名为 wpa_supplicant.conf 的文件，填写您的无线网络信息，以便树莓派开机自动连接无线网络。您还需要在 boot 分区中创建一个名为 ssh 的空白文件，以便开启 SSH 服务，方便远程访问。您可以参考这篇文章【树莓派/入门】无屏幕启动以及SSH连接(三种情况)_树莓派 ubuntu16.04不连显示器启动-CSDN博客或这篇文章https://zhuanlan.zhihu.com/p/46653100来了解如何配置网络和 SSH 服务。
+for /L %i IN (1,1,254) DO ping -w 2 -n 1 192.168.42.%i
+Wlan连接有问题：
+树莓派“Wlan0: Not associated”报错解决方案 - Rogn - 博客园 (cnblogs.com)
+使用wlan连接时
+新建文件名为SSH无拓展名的空文件
+新建wpa_supplicant.conf文件中填写
+country=CN
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+ssid="mangfu"
+psk="123456789"
+key_mgmt=WPA-PSK
+priority=1
+}
+•  第三步：远程访问树莓派。
+您可以使用 PuTTY、XShell 或其他 SSH 客户端工具，通过树莓派的 IP 地址或主机名来远程访问树莓派。树莓派的默认用户名是 pi，密码是 raspberry。您可以在路由器上查看树莓派的 IP 地址，或者使用 Advanced IP Scanner 等工具来扫描局域网内的设备。您可以参考[这篇文章]或[这篇文章]来了解如何远程访问树莓派。
+Windows端CMD输入for /L %i IN (1,1,254) DO ping -w 2 -n 1 192.168.2.%i 
+arp -a或者树莓派连接一个显示器终端输入ifconfig查找树莓派地址
+
+第四步：给树莓派分配固定ip
+	可以通过修改树莓派的DHCP客户端配置文件来实现这个目的。具体的步骤如下：
+
+首先，您需要查看当前的网络设置，包括路由器IP和域名服务器IP。您可以在树莓派的终端中输入以下命令来查看这些信息https://www.labno3.com/2021/01/27/how-to-setup-a-raspberry-pi-static-ip-address/：
+ip r | grep default
+sudo nano /etc/resolv.conf
+ 然后，您需要编辑DHCP客户端配置文件，即/etc/dhcpcd.conf。您可以在树莓派的终端中输入以下命令来编辑这个文件https://www.labno3.com/2021/01/27/how-to-setup-a-raspberry-pi-static-ip-address/：
+sudo nano /etc/dhcpcd.conf
+ 接下来，您需要在该文件中添加一些配置项，指定您想要使用的静态IP地址、路由器IP和域名服务器IP。您可以根据您的网络接口（有线或无线）和IP网段来选择合适的配置项。例如，如果您想要给无线接口wlan0分配一个静态IP地址为192.168.43.100，路由器IP为192.168.43.1，域名服务器IP为8.8.8.8，那么您可以在文件末尾添加以下内容https://www.labno3.com/2021/01/27/how-to-setup-a-raspberry-pi-static-ip-address/：
+interface wlan0
+static ip_address=192.168.43.100/24
+static routers=192.168.43.1
+static domain_name_servers=8.8.8.8
+
+例如我的：
+S6406@S6406raspberrypi:~ $ ip r | grep default
+default via 192.168.2.1 dev wlan0 proto dhcp src 192.168.2.55 metric 600
+
+S6406@S6406raspberrypi:~ $ sudo nano /etc/resolv.conf
+nameserver 127.0.0.53
+options edns0 trust-ad
+search
+
+S6406@S6406raspberrypi:~ $ sudo nano /etc/dhcpcd.conf                                                                                                                                                                                                
+interface wlan0 #此处与ip r | grep default返回的连接方式保持一致
+static ip_address=192.168.2.55/24
+static routers=192.168.2.1
+static domain_name_servers=127.0.0.53
+•  最后，您需要保存并退出文件，然后重启树莓派。重启后，树莓派将尝试使用您指定的静态IP地址连接到网络。您可以在树莓派的终端中输入以下命令来重启树莓派https://www.labno3.com/2021/01/27/how-to-setup-a-raspberry-pi-static-ip-address/：
+sudo reboot
+•  第四步：更换软件源和更新系统。
+
+•  第五步：安装 OpenMediaVault 软件。
+安装 OpenMediaVault 软件的过程是这样的：您需要在树莓派的终端中输入一条命令，这条命令会从 GitHub 上下载一个名为 OMV-extras 的脚本文件，然后运行这个脚本文件，这个脚本文件会自动下载和安装 OpenMediaVault 软件以及一些插件和依赖包。您不需要做其他的操作，只需要等待安装完成即可。这条命令是：
+wget -O - https://github.com/OpenMediaVault-Plugin-Developers/installScript/raw/master/install | sudo bash
+•  通过浏览器访问 OpenMediaVault 管理界面的过程是这样的：您需要在任何一台与树莓派连接在同一个局域网内的电脑或手机上，打开浏览器，然后在地址栏中输入树莓派的 IP 地址，例如 http://192.168.1.100。这样就可以进入 OpenMediaVault 的管理界面了。您需要输入之前设置的用户名和密码来登录 OpenMediaVault。默认的用户名是 admin，密码是 openmediavault。
+
+如果出现无法访问github的情况:
+	•  首先，您需要在windows上安装并配置好clash for windows软件，这是一个基于规则的跨平台代理软件，可以让您在windows上方便地使用各种代理服务。您可以从这个GitHub仓库https://github.com/githubvpn007/Clash-for-Windows中下载最新版本的clash for windows，并参考这篇文章https://zhuanlan.zhihu.com/p/56050058中的教程来进行安装和设置。
+您需要在windows上开启clash的HTTP代理功能，并设置一个本地端口号，例如7890。接着，您需要在树莓派上设置HTTP代理环境变量，让它指向windows上的clash的HTTP代理地址。您需要知道windows和树莓派在同一局域网下的IP地址，例如windows的IP地址是192.168.1.100，树莓派的IP地址是192.168.1.101:
+树莓派端输入 sudo nano /etc/environment
+Environment文件里面输入：
+export http_proxy="http://username:password@192.168.1.101:7890"# username是树莓派登录的用户名password是树莓派登录的密码
+export https_proxy="http://username:password@192.168.1.101:7890"
+export no_proxy="localhost, 127.0.0.1"
+树莓派端输入 sudo visudo
+文件里面输入Defaults env_keep+="http_proxy https_proxy no_proxy"
+然后crtl+s,crtl+x保存退出
+如果返回警告：
+Warning: /etc/sudoers.d/010_pi-nopasswd:2:30: User_Alias " username " referenced but not defined
+可以sudo visudo -f /etc/sudoers.d/010_pi-nopasswd然后，您可以在该文件中添加或删除username这个用户别名的定义和引用，例如：
+User_Alias username = pi
+username ALL=(ALL) NOPASSWD: ALL
+或者
+#User_Alias username = pi
+# username ALL=(ALL) NOPASSWD: ALL
+然后crtl+s,crtl+x保存退出
+然后sudo reboot重启
+继续输入下载命令即可
+•  第六步：挂载移动硬盘并创建共享文件夹。
+您需要给树莓派挂载一块移动硬盘作为数据盘，最好格式化成 ext4 格式，以提高性能和可靠性。您可以在 OpenMediaVault 的管理界面中，在存储->物理磁盘中查看硬盘信息，在存储->文件系统中对硬盘进行分区、格式化和挂载操作。然后，您可以在共享文件夹->添加中创建一个共享文件夹，并选择硬盘作为设备。您可以参考[这篇文章]或[这篇文章]来了解如何挂载硬盘并创建共享文件夹。
+
+•  第七步：配置 SMB/CIFS 服务并共享文件。
+SMB/CIFS 是一种常用的文件共享协议，可以让 Windows、Linux 和 Mac 等设备通过网络访问 NAS 上的文件。您可以在 OpenMediaVault 的管理界面中，在服务->SMB/CIFS 中开启 SMB/CIFS 服务，并在共享中添加一个共享，选择之前创建的共享文件夹，并设置相应的权限和选项。您还可以在用户->添加中创建一个用户，并设置用户名、密码和权限，以便登录 NAS 服务器。您可以参考[这篇文章]或[这篇文章]来了解如何配置 SMB/CIFS 服务并共享文件。
+
+•  第八步：访问 NAS 服务器并传输文件。
+您可以在 Windows、Linux 或 Mac 等设备上，通过网络邻居、文件管理器或终端等工具，输入 NAS 服务器的 IP 地址或主机名，来访问 NAS 上的共享文件夹。您需要输入之前设置的用户名和密码来登录 NAS 服务器。然后，您就可以浏览、上传或下载 NAS 上的文件了。您可以参考[这篇文章]或[这篇文章]来了解如何访问 NAS 服务器并传输文件。
+
