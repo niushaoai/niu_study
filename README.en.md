@@ -1,7 +1,7 @@
 # niu_study
 
 #### Description
-记录本人学习过程方便以后回顾
+Keep a record of my learning process for future reference.
 
 
 #### Contribution
